@@ -4,36 +4,6 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-class Number {
-  int row, colstart, colend, value;
-
-  public Number(int row, int colstart, int colend, int value) {
-    this.row = row;
-    this.colstart = colstart;
-    this.colend = colend;
-    this.value = value;
-  }
-
-  public String toString() {
-    return "[" + this.row + ", " + this.colstart + "-" + this.colend + "]: " + this.value;
-  }
-}
-
-class Symbol {
-  int row, col;
-  String symbol;
-
-  public Symbol(int row, int col, String symbol) {
-    this.row = row;
-    this.col = col;
-    this.symbol = symbol;
-  }
-
-  public String toString() {
-    return "[" + this.row + ", " + this.col + "]: " + this.symbol;
-  }
-}
-
 public class day03 {
   public static void main(String args[]) throws IOException {
     RandomAccessFile input = new RandomAccessFile("input", "r");
@@ -82,6 +52,52 @@ public class day03 {
     return Integer.toString(tot);
   }
 
+  public static String part2(RandomAccessFile input) throws IOException {
+    String line;
+    int row = 0;
+    ArrayList<Number> numbers = new ArrayList<>();
+    ArrayList<Symbol> symbols = new ArrayList<>();
+
+    while ((line = input.readLine()) != null) {
+      getNumbers(numbers, row, line);
+      getSymbols(symbols, row, line);
+      row += 1;
+    }
+
+    int tot = 0;
+    for (Symbol sym : symbols) {
+      if (!sym.symbol.equals("*")) {
+        continue;
+      }
+
+      ArrayList<Number> neighs = new ArrayList<>();
+
+      for (Number num: numbers) {
+        if (num.contains(sym.row - 1, sym.col - 1) ||
+            num.contains(sym.row - 1, sym.col    ) ||
+            num.contains(sym.row - 1, sym.col + 1) ||
+            num.contains(sym.row    , sym.col - 1) ||
+            num.contains(sym.row    , sym.col + 1) ||
+            num.contains(sym.row + 1, sym.col - 1) ||
+            num.contains(sym.row + 1, sym.col    ) ||
+            num.contains(sym.row + 1, sym.col + 1)) {
+          if (!neighs.contains(num)) {
+            neighs.add(num);
+          }
+        }
+      }
+
+      if (!(neighs.size() == 2)) {
+        continue;
+      }
+
+      int ratio = neighs.get(0).value * neighs.get(1).value;
+      tot += ratio;
+    }
+
+    return Integer.toString(tot);
+  }
+
   private static void getNumbers(ArrayList<Number> numbers, int row, String line) {
     Pattern pat = Pattern.compile("\\d+");
     Matcher mat = pat.matcher(line);
@@ -110,8 +126,38 @@ public class day03 {
       );
     }
   }
+}
 
-  public static String part2(RandomAccessFile input) throws IOException {
-    return "WIP";
+class Number {
+  int row, colstart, colend, value;
+
+  public Number(int row, int colstart, int colend, int value) {
+    this.row = row;
+    this.colstart = colstart;
+    this.colend = colend;
+    this.value = value;
+  }
+
+  public boolean contains(int row, int col) {
+    return (row == this.row) && (this.colstart <= col && col <= this.colend);
+  }
+
+  public String toString() {
+    return "[" + this.row + ", " + this.colstart + "-" + this.colend + "]: " + this.value;
+  }
+}
+
+class Symbol {
+  int row, col;
+  String symbol;
+
+  public Symbol(int row, int col, String symbol) {
+    this.row = row;
+    this.col = col;
+    this.symbol = symbol;
+  }
+
+  public String toString() {
+    return "[" + this.row + ", " + this.col + "]: " + this.symbol;
   }
 }
