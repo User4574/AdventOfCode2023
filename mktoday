@@ -1,3 +1,16 @@
+#!/bin/bash
+
+day=$(date +%d)
+
+[ -d day${day} ] && {
+  echo "Today already exists!"
+  exit 1
+}
+
+mkdir day${day}
+touch day${day}/test
+touch day${day}/input
+sed -e "s/XX/${day}/g" > day${day}/day${day}.java <<EOJAVA
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -18,3 +31,4 @@ public class dayXX {
     return "WIP";
   }
 }
+EOJAVA
