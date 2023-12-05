@@ -7,9 +7,9 @@ import java.util.regex.Matcher;
 public class day03 {
   public static void main(String args[]) throws IOException {
     RandomAccessFile input = new RandomAccessFile("input", "r");
-    System.out.println("Day 01 Part 1: " + part1(input));
+    System.out.println("Day 03 Part 1: " + part1(input));
     input.seek(0);
-    System.out.println("Day 01 Part 2: " + part2(input));
+    System.out.println("Day 03 Part 2: " + part2(input));
     input.close();
   }
 
