@@ -1,0 +1,11 @@
+#!/bin/bash
+
+day=$(date +%d)
+
+[ -d day${day} ] || {
+  echo "Today doesn't exist!"
+  exit 1
+}
+
+cd day${day}
+javac day${day}.java && java day${day}
