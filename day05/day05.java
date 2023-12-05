@@ -28,7 +28,28 @@ public class day05 {
   }
 
   public static String part2(RandomAccessFile input) throws IOException {
-    return "WIP";
+    Garden garden = parseGarden(input);
+    
+    long min_loc = Long.MAX_VALUE;
+    long start = -1;
+    long length = -1;
+    for (long seed: garden.seeds) {
+      if (start == -1) {
+        start = seed;
+        continue;
+      }
+      length = seed;
+
+      for(long s = start; s < start + length; s++) {
+        long loc = garden.location(s);
+        if (loc < min_loc) {
+          min_loc = loc;
+        }
+      }
+      start = -1;
+    }
+
+    return Long.toString(min_loc);
   }
 
   private static Garden parseGarden(RandomAccessFile input) throws IOException {
