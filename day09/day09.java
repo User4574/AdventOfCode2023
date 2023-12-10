@@ -28,7 +28,18 @@ public class day09 {
   }
 
   public static String part2(RandomAccessFile input) throws IOException {
-    return "WIP";
+    String line;
+    int sum = 0;
+    while ((line = input.readLine()) != null) {
+      String[] linea = line.split(" ");
+      int[] nums = new int[linea.length];
+      for (int i = 0; i < linea.length; i++) {
+        nums[i] = Integer.parseInt(linea[i]);
+      }
+
+      sum += predictPre(nums);
+    }
+    return Integer.toString(sum);
   }
 
   private static int predictNext(int[] line) {
@@ -54,6 +65,30 @@ public class day09 {
 
     ArrayList<Integer> first = differences.get(0);
     return first.get(first.size() - 1);
+  }
+
+  private static int predictPre(int[] line) {
+    ArrayList<ArrayList<Integer>> differences = new ArrayList<>();
+    ArrayList<Integer> lastDiffs = new ArrayList<>();
+
+    for (int i: line) {
+      lastDiffs.add(i);
+    }
+
+    differences.add(lastDiffs);
+
+    while (!allZero(lastDiffs)) {
+      lastDiffs = getDifferences(lastDiffs);
+      differences.add(lastDiffs);
+    }
+
+    int temp = 0;
+    for (int i = differences.size() - 2; i >= 0; i--) {
+      ArrayList<Integer> row = differences.get(i);
+      temp = row.get(0) - temp;
+    }
+
+    return temp;
   }
 
   private static boolean allZero(ArrayList<Integer> list) {
