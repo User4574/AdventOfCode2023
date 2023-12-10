@@ -127,7 +127,151 @@ public class day10 {
   }
 
   public static String part2(RandomAccessFile input) throws IOException {
-    return "WIP";
+    int srow = -1, scol = -1;
+    ArrayList<ArrayList<Tile>> grid = new ArrayList<>();
+    String line;
+
+    while ((line = input.readLine()) != null) {
+      ArrayList<Tile> row = new ArrayList<>();
+      grid.add(row);
+      for (char ch: line.toCharArray()) {
+        switch (ch) {
+          case '|':
+            row.add(Tile.Vertical);
+            break;
+          case '-':
+            row.add(Tile.Horizontal);
+            break;
+          case 'L':
+            row.add(Tile.LBend);
+            break;
+          case 'J':
+            row.add(Tile.JBend);
+            break;
+          case '7':
+            row.add(Tile.SBend);
+            break;
+          case 'F':
+            row.add(Tile.FBend);
+            break;
+          case '.':
+            row.add(Tile.Ground);
+            break;
+          case 'S':
+            row.add(Tile.Start);
+            srow = grid.size() - 1;
+            scol = row.size() - 1;
+        }
+      }
+    }
+
+    boolean upcon = false, leftcon = false,
+            downcon = false, rightcon = false;
+
+    if (srow > 0) {
+      Tile t = grid.get(srow - 1).get(scol);
+      if (t == Tile.Vertical || t == Tile.SBend || t == Tile.FBend) {
+        upcon = true;
+      }
+    }
+
+    if (scol > 0) {
+      Tile t = grid.get(srow).get(scol - 1);
+      if (t == Tile.Horizontal || t == Tile.LBend || t == Tile.FBend) {
+        leftcon = true;
+      }
+    }
+
+    if (srow < (grid.size() - 1)) {
+      Tile t = grid.get(srow + 1).get(scol);
+      if (t == Tile.Vertical || t == Tile.LBend || t == Tile.JBend) {
+        downcon = true;
+      }
+    }
+
+    if (scol < (grid.get(0).size() - 1)) {
+      Tile t = grid.get(srow).get(scol + 1);
+      if (t == Tile.Horizontal || t == Tile.JBend || t == Tile.SBend) {
+        rightcon = true;
+      
+      }
+    }
+
+    Follower fa;
+    if (upcon && rightcon) {
+      grid.get(srow).set(scol, Tile.LBend);
+      fa = new Follower(grid, srow, scol, Dir.Up);
+    } else if (upcon && downcon) {
+      grid.get(srow).set(scol, Tile.Vertical);
+      fa = new Follower(grid, srow, scol, Dir.Up);
+    } else if (upcon && leftcon) {
+      grid.get(srow).set(scol, Tile.JBend);
+      fa = new Follower(grid, srow, scol, Dir.Up);
+    } else if (rightcon && downcon) {
+      grid.get(srow).set(scol, Tile.FBend);
+      fa = new Follower(grid, srow, scol, Dir.Right);
+    } else if (rightcon && leftcon) {
+      grid.get(srow).set(scol, Tile.Horizontal);
+      fa = new Follower(grid, srow, scol, Dir.Right);
+    } else if (downcon && leftcon) {
+      
+      grid.get(srow).set(scol, Tile.SBend);
+      fa = new Follower(grid, srow, scol, Dir.Down);
+    } else {
+      System.out.println("ERROR");
+      fa = null;
+    }
+
+    ArrayList<Integer[]> loop = new ArrayList<>();
+    loop.add(new Integer[]{srow, scol});
+    fa.step();
+    while (!(fa.row == srow && fa.col == scol)) {
+      loop.add(new Integer[]{fa.row, fa.col});
+      fa.step();
+    }
+
+    for (int r = 0; r < grid.size(); r++) {
+      for (int c = 0; c < grid.get(0).size(); c++) {
+        if (!isOnLoop(loop, new Integer[]{r, c})) {
+          grid.get(r).set(c, Tile.Ground);
+        }
+      }
+    }
+
+    int inloop = 0;
+    for (int r = 0; r < grid.size(); r++) {
+      for (int c = 0; c < grid.get(0).size(); c++) {
+        if (isInsideLoop(grid, r, c)) {
+          inloop += 1;
+        }
+      }
+    }
+
+    return "WIP";//Integer.toString(inloop);
+  }
+
+  static boolean isOnLoop(ArrayList<Integer[]> loop, Integer[] coord) {
+    for (Integer[] lc: loop) {
+      if (lc[0] == coord[0] && lc[1] == coord[1]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static boolean isInsideLoop(ArrayList<ArrayList<Tile>> grid, int row, int col) {
+    if (!(grid.get(row).get(col) == Tile.Ground)) {
+      return false;
+    }
+
+    int crossings = 0;
+    while (row >= 0) {
+      if (grid.get(row).get(col) == Tile.Horizontal) {
+        crossings += 1;
+      }
+      row -= 1;
+    }
+    return crossings % 2 == 1;
   }
 
   static enum Tile {
