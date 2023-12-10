@@ -127,6 +127,8 @@ public class day10 {
   }
 
   public static String part2(RandomAccessFile input) throws IOException {
+    return "WIP";
+    /*
     int srow = -1, scol = -1;
     ArrayList<ArrayList<Tile>> grid = new ArrayList<>();
     String line;
@@ -247,7 +249,8 @@ public class day10 {
       }
     }
 
-    return "WIP";//Integer.toString(inloop);
+    return Integer.toString(inloop);
+    */
   }
 
   static boolean isOnLoop(ArrayList<Integer[]> loop, Integer[] coord) {

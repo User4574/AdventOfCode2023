@@ -70,6 +70,8 @@ public class day08 {
   }
 
   public static String part2(RandomAccessFile input) throws IOException {
+    return "WIP";
+    /*
     char[] instr = input.readLine().toCharArray();
     input.readLine();
 
@@ -139,6 +141,7 @@ public class day08 {
     }
 
     return Integer.toString(count);
+    */
   }
 }
 
