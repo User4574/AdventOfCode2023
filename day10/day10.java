@@ -269,7 +269,8 @@ public class day10 {
 
     int crossings = 0;
     while (row >= 0) {
-      if (grid.get(row).get(col) == Tile.Horizontal) {
+      Tile t = grid.get(row).get(col);
+      if (t == Tile.Horizontal || t == Tile.LBend || t == Tile.FBend) {
         crossings += 1;
       }
       row -= 1;
