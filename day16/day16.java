@@ -33,7 +33,49 @@ public class day16 {
   }
 
   public static String part2(RandomAccessFile input) throws IOException {
-    return "WIP";
+    Grid grid = new Grid();
+
+    String line;
+    while ((line = input.readLine()) != null) {
+      grid.addRow(line);
+    }
+
+    int maxV = 0, v;
+    for (int i = 0; i < grid.rows(); i++) {
+      v = testEntryPoint(i, 0, Dir.Right, grid);
+      if (v > maxV) {
+        maxV = v;
+      }
+      v = testEntryPoint(i, grid.cols() - 1, Dir.Left, grid);
+      if (v > maxV) {
+        maxV = v;
+      }
+      v = testEntryPoint(0, i, Dir.Down, grid);
+      if (v > maxV) {
+        maxV = v;
+      }
+      v = testEntryPoint(grid.rows() - 1, i, Dir.Up, grid);
+      if (v > maxV) {
+        maxV = v;
+      }
+    }
+
+    return Integer.toString(maxV);
+  }
+
+  private static int testEntryPoint(int row, int col, Dir dir, Grid grid) {
+    grid.reset();
+
+    LinkedList<Beam> beams = new LinkedList<>();
+    beams.add(new Beam(row, col, dir, grid));
+
+    while (beams.size() > 0) {
+      Beam beam = beams.remove();
+      LinkedList<Beam> splits = beam.stepThrough();
+      beams.addAll(splits);
+    }
+
+    return grid.visited();
   }
 
   private static enum Tile {
@@ -69,6 +111,11 @@ public class day16 {
     public void doSplit() {
       this.canBlackhole = true;
     }
+
+    public void reset() {
+      this.visited = false;
+      this.canBlackhole = false;
+    }
   }
 
   private static class Grid {
@@ -100,6 +147,14 @@ public class day16 {
         }
       }
       return v;
+    }
+
+    public void reset() {
+      for (ArrayList<Cell> row: this.grid) {
+        for (Cell col: row) {
+          col.reset();
+        }
+      }
     }
 
     public void addRow(String line) {
