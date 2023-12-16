@@ -23,12 +23,10 @@ public class day16 {
     LinkedList<Beam> beams = new LinkedList<>();
     beams.add(new Beam(0, 0, Dir.Right, grid));
 
-    int count = 500000;
-    while (beams.size() > 0 && count > 0) {
+    while (beams.size() > 0) {
       Beam beam = beams.remove();
       LinkedList<Beam> splits = beam.stepThrough();
       beams.addAll(splits);
-      count -= 1;
     }
 
     return Integer.toString(grid.visited());
@@ -56,14 +54,20 @@ public class day16 {
   private static class Cell {
     Tile tile;
     boolean visited;
+    boolean canBlackhole;
 
     public Cell(Tile tile) {
       this.tile = tile;
       this.visited = false;
+      this.canBlackhole = false;
     }
 
     public void visit() {
       this.visited = true;
+    }
+
+    public void doSplit() {
+      this.canBlackhole = true;
     }
   }
 
@@ -145,6 +149,7 @@ public class day16 {
     public LinkedList<Beam> stepThrough() {
       LinkedList<Beam> splits = new LinkedList<>();
 
+steppingLoop:
       while (!this.escaped()) {
         Cell cell = this.grid.cellAt(this.row, this.col);
         cell.visit();
@@ -190,35 +195,45 @@ public class day16 {
             }
             break;
           case VSplitter:
-            switch (this.dir) {
-              case Right:
-              case Left:
-                splits.add(new Beam(this.row + 1, this.col, Dir.Down, this.grid));
-                this.dir = Dir.Up;
-                this.row -= 1;
-                break;
-              case Up:
-                this.row -= 1;
-                break;
-              case Down:
-                this.row += 1;
-                break;
+            if (!cell.canBlackhole) {
+              switch (this.dir) {
+                case Right:
+                case Left:
+                  cell.doSplit();
+                  splits.add(new Beam(this.row + 1, this.col, Dir.Down, this.grid));
+                  this.dir = Dir.Up;
+                  this.row -= 1;
+                  break;
+                case Up:
+                  this.row -= 1;
+                  break;
+                case Down:
+                  this.row += 1;
+                  break;
+              }
+            } else {
+              break steppingLoop;
             }
             break;
           case HSplitter:
-            switch (this.dir) {
-              case Right:
-                this.col += 1;
-                break;
-              case Left:
-                this.col -= 1;
-                break;
-              case Up:
-              case Down:
-                splits.add(new Beam(this.row, this.col + 1, Dir.Right, this.grid));
-                this.dir = Dir.Left;
-                this.col -= 1;
-                break;
+            if (!cell.canBlackhole) {
+              switch (this.dir) {
+                case Right:
+                  this.col += 1;
+                  break;
+                case Left:
+                  this.col -= 1;
+                  break;
+                case Up:
+                case Down:
+                  cell.doSplit();
+                  splits.add(new Beam(this.row, this.col + 1, Dir.Right, this.grid));
+                  this.dir = Dir.Left;
+                  this.col -= 1;
+                  break;
+              }
+            } else {
+              break steppingLoop;
             }
             break;
           default:
